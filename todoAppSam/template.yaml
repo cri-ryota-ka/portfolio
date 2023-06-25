@@ -1,0 +1,291 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+Description: >-
+  An AWS Serverless Specification template describing your function.
+  Api gateway call HTTP get, post, and delete for lambda.
+  Lambda functions use dynamoDB items from todoApp table.
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+    Runtime: "python3.9"
+    CodeUri: "samTodoAppFunctions/"
+
+Resources:
+  # ----------
+  # iam
+  # lambdaにdynamoDBテーブルの権限を付与するiamを作成
+  # ----------
+  samTodoAppFunctionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "samTodoAppFunction-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              "sts:AssumeRole"
+            Principal:
+              Service:
+                "lambda.amazonaws.com"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: "samTodoAppFunctionPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: "samTodoAppLambdaApi"
+                Effect: "Allow"
+                Action:
+                  - "dynamodb:Scan"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:DeleteItem"
+                  - "dynamodb:UpdateItem"
+                Resource: !GetAtt samTodoAppTable.Arn
+
+  # ----------
+  # lambda
+  # dynamoDBテーブルからitemをget, post, deleteするlambdaを作成
+  # ----------
+  samTodoAppGetItemsFun:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: "samTodoAppGetItemsFun"
+      Handler: "samTodoAppGetItemsFun.lambda_handler"
+      Role: !GetAtt samTodoAppFunctionRole.Arn
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: "FunctionUpdate"
+      Events:
+        samTodoAppGetItems:
+          Type: "HttpApi"
+          Properties:
+            Method: "GET"
+            Path: "/sam_todo"
+            ApiId: !Ref samTodoAppHttpApi
+
+  samTodoAppPostItemFun:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: "samTodoAppPostItemFun"
+      Handler: "samTodoAppPostItemFun.lambda_handler"
+      Role: !GetAtt samTodoAppFunctionRole.Arn
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: "FunctionUpdate"
+      Events:
+        samTodoAppPostItem:
+          Type: "HttpApi"
+          Properties:
+            Method: "POST"
+            Path: "/sam_todo"
+            ApiId: !Ref samTodoAppHttpApi
+
+  samTodoAppUpdateItemFun:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: "samTodoAppUpdateItemFun"
+      Handler: "samTodoAppUpdateItemFun.lambda_handler"
+      Role: !GetAtt samTodoAppFunctionRole.Arn
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: "FunctionUpdate"
+      Events:
+        samTodoAppDeleteItem:
+          Type: "HttpApi"
+          Properties:
+            Method: "PATCH"
+            Path: "/sam_todo"
+            ApiId: !Ref samTodoAppHttpApi
+
+  samTodoAppDeleteItemFun:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: "samTodoAppDeleteItemFun"
+      Handler: "samTodoAppDeleteItemFun.lambda_handler"
+      Role: !GetAtt samTodoAppFunctionRole.Arn
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: "FunctionUpdate"
+      Events:
+        samTodoAppDeleteItem:
+          Type: "HttpApi"
+          Properties:
+            Method: "DELETE"
+            Path: "/sam_todo"
+            ApiId: !Ref samTodoAppHttpApi
+
+  # ----------
+  # dynamoDB
+  # lambdaのitem操作のためのdynamoDBテーブルを作成
+  # プロビジョニングされたテーブルを作成したいため、cloud formationのtypeで作成している
+  # ----------
+  samTodoAppTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "samTodoApp"
+      AttributeDefinitions:
+        - AttributeName: "timestamp"
+          AttributeType: "N"
+      KeySchema:
+        - AttributeName: "timestamp"
+          KeyType: "HASH"
+      BillingMode: "PROVISIONED"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+  # ----------
+  # api gateway
+  # lambdaのapiを共通化するためのapi gatewayを作成
+  # corsの設定も一緒に行なっている
+  # ----------
+  samTodoAppHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: "samTodoAppHttpApi"
+      CorsConfiguration:
+        AllowOrigins: 
+          - "*"
+        AllowHeaders:
+          - "content-type"
+        AllowMethods:
+          - "GET"
+          - "POST"
+          - "PATCH"
+          - "DELETE"
+          - "OPTIONS"
+        MaxAge: 0
+        AllowCredentials: false
+
+  # ----------
+  # s3
+  # s3のフロントを格納するバケット、cloud front oac用のポリシーを作成
+  # ポリシーはcloud frontで使用する
+  # ----------
+  samTodoAppS3Bucket:
+    Type: "AWS::S3::Bucket"
+    Properties: 
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+            ServerSideEncryptionByDefault:
+              SSEAlgorithm: "AES256"
+      BucketName: "todo-app-sam"
+      ObjectLockEnabled: false
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: "BucketOwnerEnforced"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  samTodoAppS3BucketPolicy:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket: !Ref samTodoAppS3Bucket
+      PolicyDocument:
+        Version: "2008-10-17"
+        Id: "PolicyForCloudFrontPrivateContent"
+        Statement:
+          - Sid: "AllowCloudFrontServicePrincipal"
+            Effect: "Allow"
+            Principal:
+              Service: "cloudfront.amazonaws.com"
+            Action: "s3:GetObject"
+            Resource: !Join
+              - ""
+              - - "arn:aws:s3:::"
+                - !Ref samTodoAppS3Bucket
+                - "/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Join
+                  - ""
+                  - - !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/"
+                    - !GetAtt samTodoAppCloudFrontDistribution.Id
+
+  # ----------
+  # cloud front
+  # cloud front function、s3用のoac、httpsのurlを作成
+  # functionはbasic認証用
+  # ----------
+  samTodoAppCloudFrontFun:
+    Type: "AWS::CloudFront::Function"
+    Properties:
+      Name: "samTodoAppCFFun"
+      AutoPublish: true
+      FunctionConfig:
+        Comment: >-
+          Basic認証
+          user, passwordは各自で書き換えてください
+        Runtime: "cloudfront-js-1.0"
+      FunctionCode: |
+        function handler(event) {
+          var request = event.request;
+          var headers = request.headers;
+          var user = "ほげ";
+          var password = "hoge";
+          var authValue = "Basic " + (user + ":" + password).toString('base64');
+          if (typeof headers.authorization === 'undefined' || headers.authorization.value !== authValue) {
+            var response = {
+              statusCode: 401,
+              statusDescription: "Unauthorized",
+              headers: {
+                "www-authenticate": { value: "Basic" }
+              }
+            };
+            return response;
+          }
+          return request;
+        };
+
+  samTodoAppCloudFrontOAC:
+    Type: "AWS::CloudFront::OriginAccessControl"
+    Properties:
+      OriginAccessControlConfig:
+        Name: "samTodoAppCloudFrontOAC"
+        OriginAccessControlOriginType: "s3"
+        SigningBehavior: "always"
+        SigningProtocol: "sigv4"
+
+
+  samTodoAppCloudFrontDistribution:
+    Type: "AWS::CloudFront::Distribution"
+    Properties:
+      DistributionConfig:
+        DefaultRootObject: "index.html"
+        Enabled: true
+        HttpVersion: "http2"
+        IPV6Enabled: false
+        PriceClass: "PriceClass_All"
+        Origins:
+          - Id: "samTodoAppS3Origin"
+            ConnectionAttempts: 1
+            ConnectionTimeout: 5
+            DomainName: !GetAtt samTodoAppS3Bucket.DomainName
+            OriginAccessControlId: !GetAtt samTodoAppCloudFrontOAC.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        DefaultCacheBehavior:
+          ViewerProtocolPolicy: "redirect-to-https"
+          CachePolicyId: "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
+          Compress: true
+          TargetOriginId: "samTodoAppS3Origin"
+          FunctionAssociations:
+            - EventType: "viewer-request"
+              FunctionARN: !GetAtt samTodoAppCloudFrontFun.FunctionMetadata.FunctionARN
+          AllowedMethods:
+            - "GET"
+            - "HEAD"
+            - "OPTIONS"
+            - "PUT"
+            - "POST"
+            - "PATCH"
+            - "DELETE"
+        Restrictions:
+          GeoRestriction:
+            Locations:
+              - JP
+            RestrictionType: "whitelist"

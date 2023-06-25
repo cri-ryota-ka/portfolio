@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="robots" content="noindex">
+        <title>CDKToDoアプリ</title>
+        <link rel="stylesheet" href="css/reset.css">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="icon" href="/img/favicon-16.png" sizes="16x16">
+        <link rel="icon" href="/img/favicon-32.png" sizes="32x32">
+        <link rel="icon" href="/img/favicon-48.png" sizes="48x48">
+    </head>
+    <body>
+        <div id="index">
+            <h1>
+                To Do リスト
+            </h1>
+            <div id="index__wrap">
+                <form id="input__form">
+                    <div id="input__form--set">
+                        <input type="text" id="input__form--title" placeholder="タイトル" maxlength="32">
+                        <textarea id="input__form--text" placeholder="本文" maxlength="1024"></textarea>
+                    </div>
+                    <button type="button" id="input__form--button">登録</button>
+                </form>
+                <div id="index__list">
+                    <ul id="index__list--list">
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <div class="copyright">2023 copyright</div>
+        </footer>
+
+        <form id="modal">
+            <p id="modal__text"></p>
+            <button id="modal__leftbutton" type="button">キャンセル</button>
+            <button id="modal__rightbutton" type="button">完了</button>
+        </form>
+        <div id="modal__overlay"></div>
+        
+        <script type="module" src="js/urls.js"></script>
+        <script type="module" src="js/event.js"></script>
+        <script type="module" src="js/modal.js"></script>
+        <script type="module" src="js/index.js"></script>
+        <script type="module" src="js/list.js"></script>
+    </body>
+</html>

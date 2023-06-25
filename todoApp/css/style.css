@@ -1,0 +1,187 @@
+/* ----------
+body, modal, etc
+---------- */
+body {
+  color: #000;
+  background-color: #fff;
+  font: normal;
+  width: 375px;
+  height: 100%;
+  margin: 0 auto;
+}
+body #modal {
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  bottom: 50%;
+  width: 375px;
+  height: 200px;
+  padding: 10px;
+  color: #000;
+  background: #fff;
+  overflow-y: auto;
+  border-radius: 10px;
+  z-index: 100;
+}
+body #modal__text {
+  white-space: pre-wrap;
+}
+body #modal button {
+  position: absolute;
+  bottom: 0;
+  width: 50%;
+  height: 35px;
+  cursor: pointer;
+  text-align: center;
+  background-color: #fff;
+  border-top: 1px solid #000;
+}
+body #modal__leftbutton {
+  left: 0;
+}
+body #modal__rightbutton {
+  right: 0;
+  border-left: 1px solid #000;
+}
+body #modal__update {
+  display: grid;
+}
+body #modal__update--title {
+  height: 25px;
+  border-radius: 5px;
+  border: 1px solid #aaa;
+}
+body #modal__update--text {
+  height: 110px;
+  border-radius: 5px;
+  border: 1px solid #aaa;
+}
+body #modal.open {
+  opacity: 1;
+  visibility: inherit;
+}
+body #modal.error {
+  opacity: 1;
+  visibility: inherit;
+}
+body #modal.error #modal__leftbutton {
+  width: 100%;
+}
+body #modal.error #modal__rightbutton {
+  opacity: 0;
+  visibility: hidden;
+}
+body #modal.reload {
+  opacity: 1;
+  visibility: inherit;
+}
+body #modal.reload #modal__leftbutton, body #modal.reload #modal__rightbutton {
+  opacity: 0;
+  visibility: hidden;
+}
+body #modal__overlay {
+  opacity: 0;
+  visibility: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
+body #modal__overlay.open {
+  opacity: 1;
+  visibility: inherit;
+}
+
+/* ----------
+index
+---------- */
+#index {
+  --inputFormHeight: 100px;
+  --inputFormMarginBottom: 20px;
+  --indexListUlTodolistHeight: 30px;
+  --indexListUlTodolistHeightSam: calc(var(--indexListUlTodolistHeight) * 3.5);
+  --indexWrapHeight: calc(var(--inputFormHeight) + var(--inputFormMarginBottom) + var(--indexListUlTodolistHeightSam));
+  position: absolute;
+  top: 20%;
+}
+#index h1 {
+  margin-bottom: 10px;
+}
+#index__wrap {
+  height: var(--indexWrapHeight);
+  width: 375px;
+}
+#index__list {
+  height: var(--indexListUlTodolistHeightSam);
+  overflow-y: scroll;
+}
+#index__list ul .ToDo__list {
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  height: var(--indexListUlTodolistHeight);
+  cursor: pointer;
+  white-space: pre-wrap;
+  display: flex;
+}
+#index__list ul .ToDo__list--set {
+  flex: 1;
+  padding: 5px 10px;
+  overflow: hidden;
+}
+#index__list ul .ToDo__list--timestamp {
+  display: none;
+}
+#index__list ul .ToDo__list--title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#index__list ul .ToDo__list--text {
+  display: none;
+}
+
+/* ----------
+form
+---------- */
+#input__form {
+  display: flex;
+  height: var(--inputFormHeight);
+  margin-bottom: var(--inputFormMarginBottom);
+}
+#input__form--set {
+  display: grid;
+  flex: 1;
+}
+#input__form--title {
+  border-radius: 5px;
+  height: 25px;
+  border: 1px solid #aaa;
+}
+#input__form--text {
+  border-radius: 5px;
+  height: 75px;
+  border: 1px solid #aaa;
+}
+#input__form--button {
+  cursor: pointer;
+  text-align: center;
+  background-color: #eee;
+  border: 1px solid #aaa;
+}
+
+/* ----------
+footter
+---------- */
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 375px;
+}
+footer .copyright {
+  color: #aaa;
+  text-align: center;
+  margin-bottom: 5px;
+}

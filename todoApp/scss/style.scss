@@ -1,0 +1,192 @@
+@charset "utf-8";
+@use "variables" as v;
+
+/* ----------
+body, modal, etc
+---------- */
+body {
+    color: v.$mainColor;
+    background-color: v.$mainBackgroundColor;
+    font: normal;
+    width: 375px;
+    height: 100%;
+    margin: 0 auto;
+    #modal {
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        bottom: 50%;
+        width: 375px;
+        height: 200px;
+        padding: 10px;
+        color: v.$mainColor;
+        background: v.$mainBackgroundColor;
+        overflow-y: auto;
+        border-radius: 10px;
+        z-index: 100;
+        &__text {
+            white-space: pre-wrap;
+        }
+        button {
+            position: absolute;
+            bottom: 0;
+            width: 50%;
+            height: 35px;
+            cursor: pointer;
+            text-align: center;
+            background-color: v.$mainBackgroundColor;
+            border-top: 1px solid v.$mainColor;
+        }
+        &__leftbutton {
+            left: 0;
+        }
+        &__rightbutton {
+            right: 0;
+            border-left: 1px solid v.$mainColor;
+        }
+        &__update {
+            display: grid;
+            &--title {
+                height: 25px;
+                border-radius: 5px;
+                border: 1px solid v.$subColor;
+            }
+            &--text {
+                height: 110px;
+                border-radius: 5px;
+                border: 1px solid v.$subColor;
+            }
+        }
+        &.open {
+            opacity: 1;
+            visibility: inherit;
+        }
+        &.error {
+            opacity: 1;
+            visibility: inherit;
+            #modal__leftbutton {
+                width: 100%;
+            }
+            #modal__rightbutton {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+        &.reload {
+            opacity: 1;
+            visibility: inherit;
+            #modal__leftbutton, #modal__rightbutton {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+    }
+    #modal__overlay {
+        opacity: 0;
+        visibility: hidden;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 120%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+        &.open {
+            opacity: 1;
+            visibility: inherit;
+        }
+    }
+}
+
+/* ----------
+index
+---------- */
+#index {
+    --inputFormHeight: 100px;
+    --inputFormMarginBottom: 20px;
+    --indexListUlTodolistHeight: 30px;
+    --indexListUlTodolistHeightSam: calc(var(--indexListUlTodolistHeight) * 3.5);
+    --indexWrapHeight: calc(var(--inputFormHeight) + var(--inputFormMarginBottom) + var(--indexListUlTodolistHeightSam));
+    position: absolute;
+    top: 20%;
+    h1 {
+        margin-bottom: 10px;
+    }
+    &__wrap {
+        height: var(--indexWrapHeight);
+        width: 375px;
+    }
+    &__list {
+        height: var(--indexListUlTodolistHeightSam);
+        overflow-y: scroll;
+        ul {
+            .ToDo__list {
+                border: 1px solid v.$subColor;
+                border-radius: 5px;
+                height: var(--indexListUlTodolistHeight);
+                cursor: pointer;
+                white-space: pre-wrap;
+                display: flex;
+                &--set {
+                    flex: 1;
+                    padding: 5px 10px;
+                    overflow: hidden;
+                }
+                &--timestamp {
+                    display: none;
+                }
+                &--title {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+                &--text {
+                    display: none;
+                }
+            }
+        }
+    }
+}
+
+/* ----------
+form
+---------- */
+#input__form {
+    display: flex;
+    height: var(--inputFormHeight);
+    margin-bottom: var(--inputFormMarginBottom);
+    &--set {
+        display: grid;
+        flex: 1;
+    }
+    &--title {
+        border-radius: 5px;
+        height: 25px;
+        border: 1px solid v.$subColor;
+    }
+    &--text {
+        border-radius: 5px;
+        height: 75px;
+        border: 1px solid v.$subColor;
+    }
+    &--button {
+        cursor: pointer;
+        text-align: center;
+        background-color: #eee;
+        border: 1px solid v.$subColor;
+    }
+}
+
+/* ----------
+footter
+---------- */
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 375px;
+    .copyright {
+        color: v.$subColor;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+}

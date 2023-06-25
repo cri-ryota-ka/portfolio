@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="robots" content="noindex">
+        <title>db sql</title>
+    </head>
+    <body>
+        <div id="main" style="display: flex;">
+            <div id="main_user" style="width: 30%;">
+                user
+                <div id="main_user_request">
+                    <input type="text" id="main_user_request_text" placeholder="no input" maxlength="8">
+                    <button id="main_user_request_button">submit</button>
+                </div>
+                <div id="main_user_edit">
+                    <select id="main_user_edit_select">
+                        <option value=0>user</option>
+                    </select>
+                    <input type="text" id="main_user_edit_text" placeholder="no input" maxlength="8">
+                    <button id="main_user_edit_button">edit</button>
+                </div>
+                <table id="main_user_get_list">
+                    <thead>
+                        <tr>
+                            <th>no.</th>
+                            <th>name</th>
+                        </tr>
+                    </thead>
+                    <tbody id="main_user_get_list_tbody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="main_info" style="width: 30%;">
+                info
+                <div id="main_info_request">
+                    <select id="main_info_request_select">
+                        <option value=0>user</option>
+                    </select>
+                    <input type="text" id="main_info_request_text" placeholder="no input" maxlength="16">
+                    <button id="main_info_request_button">submit</button>
+                </div>
+                <div id="main_info_delete">
+                    <select id="main_info_delete_select">
+                        <option value=0>info</option>
+                    </select>
+                    <button id="main_info_delete_button">delete</button>
+                </div>
+                <table id="main_info_get_list">
+                    <thead>
+                        <tr>
+                            <th>no.</th>
+                            <th>info</th>
+                        </tr>
+                    </thead>
+                    <tbody id="main_info_get_list_tbody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="main_user-info" style="width: 40%;">
+                user & info
+                <div style="color: red;">表示を更新するには再読み込みが必要</div>
+                <table id="main_user-info_get_list">
+                    <thead>
+                        <tr>
+                            <th>user_no.</th>
+                            <th>name</th>
+                            <th>info</th>
+                        </tr>
+                    </thead>
+                    <tbody id="main_user-info_get_list_tbody">
+                    </tbody>
+            </div>
+        </div>
+
+        <script src="others/index.js"></script>
+    </body>
+</html>
